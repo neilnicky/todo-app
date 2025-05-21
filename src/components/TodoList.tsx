@@ -18,7 +18,18 @@ export default function TodoList() {
   const todos = useAppSelector((state: RootState) => state.todo.items);
   const dispatch = useAppDispatch();
 
+  const handleEditClick = (todoId: string, currentText: string) => {
+    setEditId(todoId);
+    setEditText(currentText);
+  };
 
+  const handleEditSubmit = (todoId: string) => {
+    if (editText.trim() !== "") {
+      dispatch(editTodo({ id: todoId, text: editText }));
+    }
+    setEditId(null);
+    setEditText("");
+  };
 
   return (
     <div className="rounded-full flex-col ">
@@ -32,7 +43,27 @@ export default function TodoList() {
                 todo.completed ? "line-through text-gray-400" : ""
               }`}
             >
-             
+              {editId === todo.id ? (
+                <input
+                  className="flex-1 mr-2 p-1 border rounded"
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  onBlur={() => handleEditSubmit(todo.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleEditSubmit(todo.id);
+                    }
+                  }}
+                  autoFocus
+                />
+              ) : (
+                <span
+                  className="cursor-pointer flex-1"
+                  onClick={() => dispatch(toggleTodo(todo.id))}
+                >
+                  {todo.text}
+                </span>
+              )}
               <Pencil
                 size={18}
                 onClick={() => handleEditClick(todo.id, todo.text)}
